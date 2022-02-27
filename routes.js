@@ -22,7 +22,7 @@ router.get("/bio", (req, res) => {
     })
 })
 
-router.get("/json", (req, res) => { 
+router.post("/json", (req, res) => { 
     res.json(req.body)
 })
 
