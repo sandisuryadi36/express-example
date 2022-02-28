@@ -1,4 +1,8 @@
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/userModel');
+
+const sync = { alter: true }
 
 const index = (req, res) => { 
     res.send({
@@ -33,7 +37,6 @@ const index = (req, res) => {
 
 const viewAll = async (req, res) => {
     try {
-        // await User.sync();
         const data = await User.findAll();
         res.status(200).send(data);
     } catch (error) {
@@ -43,13 +46,19 @@ const viewAll = async (req, res) => {
 
 const create = async (req, res) => {
     const { firstName, lastName, age, job } = req.body;
+    const image = req.file;
+    if (image) {
+        const target = path.join("uploads", image.originalname)
+        fs.renameSync(image.path, target);
+    }
     try {
-        await User.sync();
+        await User.sync(sync);
         const data = await User.create({
             firstName,
             lastName,
             age,
-            job
+            job,
+            img_url: image ? `${req.protocol}://${req.headers.host}/public/${image.originalname}` : null
         })
         res.status(200).send({
             message: "Success",
@@ -63,13 +72,19 @@ const create = async (req, res) => {
 const update = async (req, res) => { 
     const { id } = req.params;
     const { firstName, lastName, age, job } = req.body;
+    const image = req.file;
+    if (image) {
+        const target = path.join("uploads", image.originalname)
+        fs.renameSync(image.path, target);
+    }
     try {
-        await User.sync();
+        await User.sync(sync);
         const data = await User.update({
             firstName,
             lastName,
             age,
-            job
+            job,
+            img_url: image ? `${req.protocol}://${req.headers.host}/public/${image.originalname}` : null
         }, {
             where: {
                 id
@@ -87,7 +102,7 @@ const update = async (req, res) => {
 const deleteUser = async (req, res) => { 
     const { id } = req.params;
     try {
-        await User.sync();
+        await User.sync(sync);
         const data = await User.destroy({
             where: {
                 id

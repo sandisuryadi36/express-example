@@ -9,7 +9,6 @@ const User = sequelize.define('User', {
     },
     lastName: {
         type: DataTypes.STRING
-        // allowNull defaults to true
     },
     age: {
         type: DataTypes.INTEGER,
@@ -18,6 +17,9 @@ const User = sequelize.define('User', {
     job: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    img_url: {
+        type: DataTypes.STRING,
     }
 }, {
     freezeTableName: true
