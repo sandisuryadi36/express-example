@@ -1,13 +1,13 @@
 const express = require('express');
-const logger = require('./middlewares/logger');
 const router = require('./routes');
 const app = express();
+const logger = require('morgan');
 
 // get environment variables
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(logger, router)
+app.use(logger("tiny"), router)
 
 // 404 error
 app.use((req, res) => {
