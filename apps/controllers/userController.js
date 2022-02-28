@@ -58,7 +58,7 @@ const create = async (req, res) => {
             lastName,
             age,
             job,
-            img_url: image ? `${req.protocol}://${req.headers.host}/public/${image.originalname}` : null
+            img_url: image ? `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}` : null
         })
         res.status(200).send({
             message: "Success",
@@ -84,7 +84,7 @@ const update = async (req, res) => {
             lastName,
             age,
             job,
-            img_url: image ? `${req.protocol}://${req.headers.host}/public/${image.originalname}` : null
+            img_url: image ? `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}` : null
         }, {
             where: {
                 id
