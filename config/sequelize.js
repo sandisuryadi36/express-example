@@ -19,6 +19,7 @@ switch (env) {
         });
         break;
     case `production`:
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
         sequelize = new Sequelize({
             database: process.env.PGDATABASE,
             username: process.env.PGUSER,
