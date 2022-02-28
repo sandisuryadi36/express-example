@@ -9,7 +9,10 @@ let sequelize
 // checking environtment
 switch (env) {
     case 'development':
-        sequelize = new Sequelize('edu_sequelize', 'root', 'admin', {
+        sequelize = new Sequelize({
+            database: 'edu_sequelize',
+            username: 'root',
+            password: 'admin',
             host: 'localhost',
             port: 3306,
             dialect: `mysql` /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */
