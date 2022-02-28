@@ -6,7 +6,7 @@ const logger = require('morgan');
 // get environment variables
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json())
 app.use(logger("tiny"), router)
 
 // 404 error
