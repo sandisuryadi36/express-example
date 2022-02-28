@@ -1,28 +1,34 @@
+const User = require('./apps/models/userModel');
+
 const router = require('express').Router();
 
-router.get("/", (req, res) => {
-    
-    res.send({
-        message: "Welcome to home page",
-        status: "success",
-        bio: `${req.protocol}://${req.headers.host}/bio`,
-        json: {
-            message: "Use json body to send data",
-            link: `${req.protocol}://${req.headers.host}/json`
-        }
-    });
+router.get("/", async (req, res) => {
+    try {
+        // await User.sync();
+        const data = await User.findAll();
+        res.status(200).send(data);
+    } catch(error) {
+        res.send(error);
+    }
 })
 
-router.get("/bio", (req, res) => {
-    res.send({
-        name: "Sandi Suryadi",
-        age: "29",
-        hobbies: ["eating", "sleeping", "coding"]
-    })
-})
-
-router.post("/json", (req, res) => { 
-    res.json(req.body)
+router.post("/user", async (req, res) => {
+    const { firstName, lastName, age, job } = req.body;
+    try {
+        await User.sync();
+        const data = await User.create({
+            firstName,
+            lastName,
+            age,
+            job
+        })
+        res.status(200).send({
+            message: "Success",
+            data
+        });
+    } catch(error) {
+        res.send(error);
+    }
 })
 
 
