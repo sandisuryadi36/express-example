@@ -44,6 +44,27 @@ const viewAll = async (req, res) => {
     }
 }
 
+const viewOne = async (req, res) => { 
+    const { id } = req.params;
+    try {
+        const data = await User.findOne({
+            where: {
+                id
+            }
+        })
+
+        if (data) {
+            res.status(200).send(data);
+        } else { 
+            res.status(404).send({
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        res.send(error);
+    }
+}
+
 const create = async (req, res) => {
     const { firstName, lastName, age, job } = req.body;
     const image = req.file;
@@ -120,6 +141,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
     index,
     viewAll,
+    viewOne,
     create,
     update,
     deleteUser
