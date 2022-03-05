@@ -1,13 +1,13 @@
-const Controller = require('./apps/controllers/userController');
 const router = require('express').Router();
+const Controller = require('./apps/controllers/productController');
 //import multer
 const multer = require('multer');
 const upload = multer({ dest: './uploads/' });
 
-router.get('/', Controller.index)
-router.get("/user", Controller.viewAll)
-router.post("/user", upload.single("avatar"), Controller.create)
-router.put("/user/:id", upload.single("avatar"), Controller.update)
-router.delete("/user/:id", Controller.deleteUser)
+router.get("/product", Controller.viewAll)
+router.get("/product/:id", Controller.viewOne)
+router.post("/product", upload.single("image"), Controller.create)
+router.put("/product/:id", upload.single("image"), Controller.update)
+router.delete("/product/:id", Controller.drop)
 
 module.exports = router;
