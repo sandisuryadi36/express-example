@@ -1,13 +1,21 @@
+require('./config/mongoose');
 const express = require('express');
-const logger = require('./middlewares/logger');
 const router = require('./routes');
 const app = express();
+const logger = require('morgan');
+const path = require('path');
+const cors = require('cors');
 
 // get environment variables
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(logger, router)
+app.use(cors())
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(logger("tiny"))
+app.use(router)
+app.use("/public", express.static(path.join(__dirname + "/uploads")))
+
 
 // 404 error
 app.use((req, res) => {
