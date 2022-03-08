@@ -2,16 +2,26 @@ const path = require('path');
 const fs = require('fs');
 const Product = require('../models/productModel');
 
-const viewAll = (req, res) => { 
-    Product.find({}, (err, products) => {
-        if (err) {
-            res.send(err);
-        }
-        res.json(products);
-    });
+const viewAll = (req, res) => {
+    if (req.query.search) {
+        let text = req.query.search;
+        Product.find({ name: { $regex: '.*' + text.toLowerCase() + '.*', $options: 'i' } }, (err, products) => {
+            if (err) {
+                res.send(err);
+            }
+            res.json(products);
+        });
+    } else {
+        Product.find({}, (err, products) => {
+            if (err) {
+                res.send(err);
+            }
+            res.json(products);
+        });
+    }
 }
 
-const viewOne = (req, res) => { 
+const viewOne = (req, res) => {
     Product.findById(req.params.id, (err, product) => {
         if (err) {
             res.send(err);
@@ -20,7 +30,7 @@ const viewOne = (req, res) => {
     });
 }
 
-const create = (req, res) => { 
+const create = (req, res) => {
     const newProduct = new Product(req.body);
     const image = req.file;
     if (image) {
@@ -52,7 +62,7 @@ const update = (req, res) => {
     if (image) {
         const target = path.join("uploads", image.originalname)
         fs.renameSync(image.path, target);
-    
+
         Product.findById(req.params.id, (err, product) => {
             if (err) {
                 res.send(err);
@@ -75,7 +85,7 @@ const update = (req, res) => {
                 });
             });
         })
-    } else { 
+    } else {
         Product.updateOne({ _id: req.params.id }, { $set: req.body }, (err, product) => {
             if (err) {
                 res.send(err);
@@ -88,7 +98,7 @@ const update = (req, res) => {
     }
 }
 
-const drop = (req, res) => { 
+const drop = (req, res) => {
     Product.findByIdAndRemove(req.params.id, (err, product) => {
         if (err) {
             res.send(err);
@@ -102,5 +112,5 @@ module.exports = {
     viewOne,
     create,
     update,
-    drop
+    drop,
 }
