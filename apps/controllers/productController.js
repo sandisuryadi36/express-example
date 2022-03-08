@@ -26,7 +26,15 @@ const create = (req, res) => {
     if (image) {
         const target = path.join("uploads", image.originalname)
         fs.renameSync(image.path, target);
-        newProduct.image_url = `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}`
+        newProduct.image = {
+            fileName: image.originalname,
+            filePath: `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}`
+        }
+    } else {
+        newProduct.image = {
+            fileName: null,
+            filePath: null
+        }
     }
     newProduct.save((err, product) => {
         if (err) {
@@ -44,17 +52,31 @@ const update = (req, res) => {
     if (image) {
         const target = path.join("uploads", image.originalname)
         fs.renameSync(image.path, target);
-    }
-    Product.findById(req.params.id, (err, product) => {
-        if (err) {
-            res.send(err);
-        }
-        product.name = req.body.name;
-        product.price = req.body.price;
-        product.stock = req.body.stock;
-        product.status = req.body.status;
-        product.image_url = image ? `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}` : null
-        product.save((err, product) => {
+    
+        Product.findById(req.params.id, (err, product) => {
+            if (err) {
+                res.send(err);
+            }
+            product.name = req.body.name;
+            product.price = req.body.price;
+            product.stock = req.body.stock;
+            product.status = req.body.status;
+            product.image = {
+                fileName: image ? image.originalname : null,
+                filePath: image ? `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}` : null
+            }
+            product.save((err, product) => {
+                if (err) {
+                    res.send(err);
+                }
+                res.json({
+                    message: 'Product successfully updated',
+                    product
+                });
+            });
+        })
+    } else { 
+        Product.updateOne({ _id: req.params.id }, { $set: req.body }, (err, product) => {
             if (err) {
                 res.send(err);
             }
@@ -62,8 +84,8 @@ const update = (req, res) => {
                 message: 'Product successfully updated',
                 product
             });
-        });
-    });
+        })
+    }
 }
 
 const drop = (req, res) => { 

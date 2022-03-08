@@ -18,8 +18,13 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    image_url: {
-        type: String,
+    image: {
+        fileName: {
+            type: String,
+        },
+        filePath: {
+            type: String,
+        }
     }
 })
 

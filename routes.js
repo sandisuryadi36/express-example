@@ -7,7 +7,7 @@ const upload = multer({ dest: './uploads/' });
 router.get("/product", Controller.viewAll)
 router.get("/product/:id", Controller.viewOne)
 router.post("/product", upload.single("image"), Controller.create)
-router.put("/product/:id", upload.single("image"), Controller.update)
+router.patch("/product/:id", upload.single("image"), Controller.update)
 router.delete("/product/:id", Controller.drop)
 
 module.exports = router;
