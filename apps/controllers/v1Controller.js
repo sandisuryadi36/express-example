@@ -1,20 +1,20 @@
 const path = require('path');
 const fs = require('fs');
-const Product = require('../models/productModel');
+const db = require('../../config/mongoDB');
+const { ObjectId } = require('mongodb');
 
 // get all controller
-const viewAll = (req, res) => {
+const viewAll = (req, res) => { 
     if (req.query.search) {
-        console.log(req.query.search);
         let text = req.query.search;
-        Product.find({ name: { $regex: '.*' + text.toLowerCase() + '.*', $options: 'i' } }, (err, products) => {
+        db.collection('products').find({ name: { $regex: '.*' + text.toLowerCase() + '.*', $options: 'i' } }).toArray((err, products) => { 
             if (err) {
                 res.send(err);
             }
             res.json(products);
         });
     } else {
-        Product.find({}, (err, products) => {
+        db.collection('products').find({}).toArray((err, products) => { 
             if (err) {
                 res.send(err);
             }
@@ -24,8 +24,8 @@ const viewAll = (req, res) => {
 }
 
 // get one controller
-const viewOne = (req, res) => {
-    Product.findById(req.params.id, (err, product) => {
+const viewOne = (req, res) => { 
+    db.collection('products').findOne({ _id: ObjectId(req.params.id) }, (err, product) => { 
         if (err) {
             res.send(err);
         }
@@ -34,8 +34,8 @@ const viewOne = (req, res) => {
 }
 
 // post controller
-const create = (req, res) => {
-    const newProduct = new Product(req.body);
+const create = (req, res) => { 
+    const newProduct = req.body;
     const image = req.file;
     if (image) {
         const target = path.join("uploads", image.originalname)
@@ -50,7 +50,7 @@ const create = (req, res) => {
             filePath: null
         }
     }
-    newProduct.save((err, product) => {
+    db.collection('products').insertOne(newProduct, (err, product) => { 
         if (err) {
             res.send(err);
         }
@@ -62,36 +62,18 @@ const create = (req, res) => {
 }
 
 // patch controller
-const update = (req, res) => {
+const update = (req, res) => { 
     const image = req.file;
     if (image) {
         const target = path.join("uploads", image.originalname)
         fs.renameSync(image.path, target);
 
-        Product.findById(req.params.id, (err, product) => {
-            if (err) {
-                res.send(err);
-            }
-            product.name = req.body.name;
-            product.price = req.body.price;
-            product.stock = req.body.stock;
-            product.status = req.body.status;
-            product.image = {
-                fileName: image ? image.originalname : null,
-                filePath: image ? `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}` : null
-            }
-            product.save((err, product) => {
-                if (err) {
-                    res.send(err);
-                }
-                res.json({
-                    message: 'Product successfully updated',
-                    product
-                });
-            });
-        })
-    } else {
-        Product.updateOne({ _id: req.params.id }, { $set: req.body }, (err, product) => {
+        const updatedProduct = req.body;
+        updatedProduct.image = {
+            fileName: image.originalname,
+            filePath: `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}`
+        }
+        db.collection('products').updateOne({ _id: ObjectId(req.params.id) }, {$set : updatedProduct} , (err, product) => { 
             if (err) {
                 res.send(err);
             }
@@ -99,17 +81,31 @@ const update = (req, res) => {
                 message: 'Product successfully updated',
                 product
             });
-        })
+        });
+    } else {
+        const updatedProduct = req.body;
+        db.collection('products').updateOne({ _id: ObjectId(req.params.id) }, { $set: updatedProduct }, (err, product) => { 
+            if (err) {
+                res.send(err);
+            }
+            res.json({
+                message: 'Product successfully updated',
+                product
+            });
+        });
     }
 }
 
 // delete controller
-const remove = (req, res) => {
-    Product.findByIdAndRemove(req.params.id, (err, product) => {
+const remove = (req, res) => { 
+    db.collection('products').deleteOne({ _id: ObjectId(req.params.id) }, (err, product) => { 
         if (err) {
             res.send(err);
         }
-        res.json({ message: 'Product successfully deleted' });
+        res.json({
+            message: 'Product successfully deleted',
+            product
+        });
     });
 }
 
@@ -118,5 +114,5 @@ module.exports = {
     viewOne,
     create,
     update,
-    remove,
+    remove
 }

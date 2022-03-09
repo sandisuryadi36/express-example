@@ -16,5 +16,5 @@ switch (env) {
         break
 }
 
-db.once('open', () => { console.log('Connected to MongoDB') });
+db.once('open', () => { console.log('Connected to Mongoose') });
 db.on('error', (err) => { console.log(err) });
