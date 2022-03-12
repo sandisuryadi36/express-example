@@ -109,7 +109,10 @@ const remove = (req, res) => {
         if (err) {
             res.send(err);
         }
-        res.json({ message: 'Product successfully deleted' });
+        res.json({
+            message: 'Product successfully deleted',
+            product
+        });
     });
 }
 
