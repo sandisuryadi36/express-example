@@ -56,44 +56,33 @@ const create = (req, res) => {
         }
         res.json({
             message: 'Product successfully added',
-            product
+            newProduct
         });
     });
 }
 
-// patch controller
+// put controller
 const update = (req, res) => { 
     const image = req.file;
+
+    const updatedProduct = req.body;
     if (image) {
         const target = path.join("uploads", image.originalname)
         fs.renameSync(image.path, target);
-
-        const updatedProduct = req.body;
         updatedProduct.image = {
             fileName: image.originalname,
             filePath: `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}`
         }
-        db.collection('products').updateOne({ _id: ObjectId(req.params.id) }, {$set : updatedProduct} , (err, product) => { 
-            if (err) {
-                res.send(err);
-            }
-            res.json({
-                message: 'Product successfully updated',
-                product
-            });
-        });
-    } else {
-        const updatedProduct = req.body;
-        db.collection('products').updateOne({ _id: ObjectId(req.params.id) }, { $set: updatedProduct }, (err, product) => { 
-            if (err) {
-                res.send(err);
-            }
-            res.json({
-                message: 'Product successfully updated',
-                product
-            });
-        });
     }
+    db.collection('products').findOneAndUpdate({ _id: ObjectId(req.params.id) }, {$set : updatedProduct} , {returnDocument: true}, (err, product) => { 
+        if (err) {
+            res.send(err);
+        }
+        res.json({
+            message: 'Product successfully updated',
+            product
+        });
+    });
 }
 
 // delete controller

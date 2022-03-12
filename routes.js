@@ -9,14 +9,14 @@ const upload = multer({ dest: './uploads/' });
 router.get("/v1/product", ControllerV1.viewAll)
 router.get("/v1/product/:id", ControllerV1.viewOne)
 router.post("/v1/product", upload.single('image'), ControllerV1.create)
-router.patch("/v1/product/:id", upload.single('image'), ControllerV1.update)
+router.put("/v1/product/:id", upload.single('image'), ControllerV1.update)
 router.delete("/v1/product/:id", ControllerV1.remove)
 
 // route using mongoose
 router.get("/v2/product", ControllerV2.viewAll)
 router.get("/v2/product/:id", ControllerV2.viewOne)
 router.post("/v2/product", upload.single("image"), ControllerV2.create)
-router.patch("/v2/product/:id", upload.single("image"), ControllerV2.update)
+router.put("/v2/product/:id", upload.single("image"), ControllerV2.update)
 router.delete("/v2/product/:id", ControllerV2.remove)
 
 module.exports = router;

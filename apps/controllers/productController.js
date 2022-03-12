@@ -61,46 +61,28 @@ const create = (req, res) => {
     });
 }
 
-// patch controller
+// put controller
 const update = (req, res) => {
     const image = req.file;
+    const updatedProduct = req.body;
+
     if (image) {
         const target = path.join("uploads", image.originalname)
         fs.renameSync(image.path, target);
-
-        Product.findById(req.params.id, (err, product) => {
-            if (err) {
-                res.send(err);
-            }
-            product.name = req.body.name;
-            product.price = req.body.price;
-            product.stock = req.body.stock;
-            product.status = req.body.status;
-            product.image = {
-                fileName: image ? image.originalname : null,
-                filePath: image ? `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}` : null
-            }
-            product.save((err, product) => {
-                if (err) {
-                    res.send(err);
-                }
-                res.json({
-                    message: 'Product successfully updated',
-                    product
-                });
-            });
-        })
-    } else {
-        Product.updateOne({ _id: req.params.id }, { $set: req.body }, (err, product) => {
-            if (err) {
-                res.send(err);
-            }
-            res.json({
-                message: 'Product successfully updated',
-                product
-            });
-        })
+        updatedProduct.image = {
+            fileName: image.originalname,
+            filePath: `${req.protocol}://${req.headers.host}/public/${encodeURI(image.originalname)}`
+        }
     }
+    Product.findOneAndUpdate({ _id: req.params.id }, { $set: updatedProduct },{new: true}, (err, product) => { 
+        if (err) {
+            res.send(err);
+        }
+        res.json({
+            message: 'Product successfully updated',
+            product
+        });
+    })
 }
 
 // delete controller
